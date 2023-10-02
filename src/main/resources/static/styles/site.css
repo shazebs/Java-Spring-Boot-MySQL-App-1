@@ -1,0 +1,48 @@
+body {
+	padding:5%;
+	padding-top:1%;
+}
+
+label {
+	margin-top:1%;
+	padding-right:1%;
+	font-weight:bolder;
+}
+
+#navbar {
+	margin-bottom:1%;
+}
+
+.StatusBox {
+	margin-top:2%;
+	border-top:2px dashed dodgerblue;
+	padding-bottom:2%;
+	word-wrap:break-word;
+}
+
+#StatusPhotoUrlInput {
+	width:100%;
+}
+
+.PhotoPreview {
+	display:block;
+	height:auto;
+	margin:1% 0%;
+	max-width:100%;
+	transition: all 0.4s;
+	width:300px;
+}
+	.PhotoPreview:hover {
+		cursor:pointer;
+		width:600px;
+	}
+
+#StatusMessageInput {
+	width:100%;
+	padding:1%;
+	min-height:250px;
+}
+
+#SubmitStatusBtn {
+	margin-top:1%;
+}
