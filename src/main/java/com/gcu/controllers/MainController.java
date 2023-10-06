@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gcu.models.Status;
+import com.gcu.services.DatabaseService;
 
 
 /**
@@ -35,58 +36,20 @@ import com.gcu.models.Status;
 @RequestMapping("/") // mapped to our landing page.
 public class MainController 
 {	
-	@Autowired
-	@SuppressWarnings("unused")
-	private DataSource dataSource; 
+	private Logger logger = LoggerFactory.getLogger(MainController.class);
 	
-	@Autowired
-	@SuppressWarnings("unused")
-	private JdbcTemplate database; 
-
-	private static Logger logger = LoggerFactory.getLogger(MainController.class);
+	private DatabaseService dbService; 
 	
-	
+	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a, M-dd-yyyy");
 	
 	/**
 	 * Class Constructor. 
 	 * @param dataSource
 	 */
 	public MainController(DataSource dataSource)
-	{
-		this.dataSource = dataSource;
-		this.database = new JdbcTemplate(dataSource);
-	}
-	
-	
-	
-	/**
-	 * Add new Status to database.
-	 * @param status
-	 */
-	public void AddNewStatus(Status status)
-	{
-		logger.info("Entering MainController:AddNewStatus method.");
-		
-		try {
-			String sql = "INSERT INTO statuses (Id, Author, Message, PhotoUrl, Datetime) VALUES (?, ?, ?, ?, ?)";
-			int result = database.update(sql, 
-										 status.getId(), 
-										 status.getAuthor(),	
-										 status.getMessage(), 
-										 status.getPhotoUrl(), 
-										 status.getDatetime());
-		}
-		catch (Exception e) 
-		{
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			logger.info("Error adding new Status to database.");
-		}
-		
-		logger.info("Exiting MainController:AddNewStatus method.");
-	}
-	
-	
+	{		
+		this.dbService = new DatabaseService(dataSource);
+	}		
 	
 	/**
 	 * Delete a Status by matching its ID for removal from the database.
@@ -94,30 +57,17 @@ public class MainController
 	 * @param model
 	 * @return
 	 */
-	@GetMapping("/deleteStatus/{id}")
+	@GetMapping("/delete/{id}")
 	public String DeleteStatus(@PathVariable int id, Model model)
 	{
-		logger.info("Entering MainController:DeleteStatus method.");
+		logger.info("Entering MainController:DeleteStatus() with id: " + id);
 		
-		try 
-		{
-			String sql = "DELETE FROM statuses WHERE Id = ?";
-	        database.update(sql, id);
-	        logger.info("Successfully deleted StatusID '" + id + "' from database.");
-		}
-		catch (Exception e) 
-		{
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			logger.info("Error deleting StatusID '" + id + "' in database.");
-		}
+		boolean resultOfDeletion = dbService.DeleteStatusByIdFromDB(id);
 
-		logger.info("Exiting MainController:DeleteStatus method.");
+		logger.info("Exiting MainController:DeleteStatus() with result of id '" + id + "' deletion: " + resultOfDeletion);
 		
 		return DisplayHomePage(model);
 	}
-	
-	
 	
 	/**
 	 * Display Home page. 
@@ -127,58 +77,38 @@ public class MainController
 	@GetMapping("/home")
 	public String DisplayHomePage(Model model) 
 	{
-		logger.info("Entering MainController:DisplayHomePage method.");
+		logger.info("Entering MainController:DisplayHomePage()");
 		
-		try {
-			Integer count = database.queryForObject("SELECT COUNT(*) FROM statuses", Integer.class);
-	    	if (count >= 0) 
-	    		logger.info("Database table Statuses exists.");	
-		}
-		catch (Exception e)
+		List<Status> statuses = new ArrayList<Status>();		
+		if (dbService.CheckIfStatusTableExistsInDB())
 		{
-			logger.error(e.getMessage());
-			
-			String createTableSql = 
-				"CREATE TABLE statuses (" 
-					+"Id INT PRIMARY KEY AUTO_INCREMENT, "
-					+"Author VARCHAR(255) NOT NULL, "
-					+"Message VARCHAR(1000) NOT NULL, "
-					+"PhotoUrl VARCHAR(1000) NULL, "
-					+"Datetime VARCHAR(100) NOT NULL);";			
-			
-			database.execute(createTableSql); 
-			
-			logger.info("Sql table Statuses did not exist so application created one.");
+			statuses = dbService.GetAllStatusDescendingByIdFromDB();
 		}
-				
-		List<Status> statuses = GetAllStatuses();
+		else 
+		{
+			dbService.CreateStatusDBTable();
+		}
 		
 		model.addAttribute("statuses", statuses);
 		model.addAttribute("status", new Status()); 
 		
-		logger.info("Exiting MainController:DisplayHomePage method.");
+		logger.info("Exiting MainController:DisplayHomePage() with '" + statuses.size() + "' Statuses.");
 		
 		return "home.html"; 
 	}
 	
-	
-	
 	/**
-	 * Display landing page (index).
+	 * Display index landing page.
 	 * @param model
 	 * @return
 	 */
 	@GetMapping("/")
 	public String DisplayIndexPage(Model model) 
 	{
-		logger.trace("Entering MainController:DisplayIndexPage method.");		
-
-		logger.trace("Exiting MainController:DisplayIndexPage method.");
+		logger.trace("Entering and Exiting MainController:DisplayIndexPage()");	
 		
 		return "index.html"; 
-	}
-	
-	
+	}	
 	
 	/**
 	 * Display Post page.
@@ -187,45 +117,13 @@ public class MainController
 	 */
 	@GetMapping("/post")
 	public String DisplayPostPage(@ModelAttribute Status status, Model model) 
-	{
-		logger.info("Entering MainController:DisplayPostPage method.");
-		
+	{				
+		logger.info("Entering and Exiting MainController:DisplayPostPage() with Status: " + status.ToString());
+
 		model.addAttribute("status", status);
 		
-		logger.info("Exiting MainController:DisplayPostPage method.");
-		
 		return "post.html"; 
-	}
-	
-	
-	
-	/**
-	 * Check database to see if a Status item exists with a specified ID.
-	 * @param id
-	 * @return
-	 */
-	public boolean DoesStatusExist(int id)
-	{
-		logger.info("Entering MainController:DoesStatusExist method.");
-		
-		int count = -1;		
-		try {
-			String sql = "SELECT COUNT(*) FROM statuses WHERE Id = ?";
-	        count = database.queryForObject(sql, Integer.class, id);
-		}
-		catch (Exception e) 
-		{
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			logger.info("Error detecting if StatusID " + id + " exists in database.");			
-		}
-        
-        logger.info("Exiting MainController:DoesStatusExist method.");
-        
-        return count > 0;
-	}
-	
-	
+	}	
 	
 	/**
 	 * Edit Status item in Post page.
@@ -236,103 +134,20 @@ public class MainController
 	@GetMapping("/post/{id}")
 	public String EditPost(@PathVariable int id, Model model)
 	{
-		logger.info("Entering MainController:EditPost method.");
+		logger.info("Entering MainController:EditPost() with id: " + id);
 		
 		Status status = new Status();		
-		try 
+		if (dbService.DoesStatusIdExistInDB(id))
 		{
-			if (DoesStatusExist(id))
-			{
-				status = GetStatusById(id);
-			}
-		}
-		catch (Exception e)
-		{
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			logger.info("Error updating StatusID " + id + " in database.");
+			status = dbService.GetStatusByIdFromDB(id);
 		}
 		
 		model.addAttribute("status", status);
 		
-		logger.info("Exiting MainController:EditPost method.");
+		logger.info("Exiting MainController:EditPost() with Status: " + status.ToString());
 		
-		return DisplayPostPage(status, model);
-	}
-	
-	
-	
-	/**
-	 * Retrieve a list of all Status items from database.
-	 * @return
-	 */
-	public List<Status> GetAllStatuses()
-	{
-		logger.info("Entering MainController:GetAllStatuses method.");
-		
-		List<Status> statuses = new ArrayList<Status>();
-		try {
-			String sql = "SELECT * FROM statuses ORDER BY Id DESC";
-			SqlRowSet record = database.queryForRowSet(sql);
-			while (record.next())
-			{
-				statuses.add(new Status(
-						record.getInt("Id"),
-						record.getString("Author"),
-						record.getString("Message"),
-						record.getString("PhotoUrl"),
-						record.getString("Datetime")));
-			}
-		}
-		catch (Exception e) 
-		{
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			logger.info("Error retrieving all Statuses from database.");
-		}
-		
-		logger.info("Exiting MainController:GetAllStatuses method.");
-		
-		return statuses;
-	}
-	
-	
-	
-	/**
-	 * Get a Status item by its ID from the database.
-	 * @param id
-	 * @return
-	 */
-	public Status GetStatusById(int id)
-	{
-		logger.info("Entering MainController:GetStatusById method");
-		
-		Status statusItem = null;
-		try {
-			String sql = "SELECT * FROM statuses WHERE Id = ?";
-			statusItem = database.queryForObject(sql, (rs, rowNum) -> {
-	            Status result = new Status();
-	            result.setId(rs.getInt("Id"));
-	            result.setAuthor(rs.getString("Author"));
-	            result.setMessage(rs.getString("Message"));
-	            result.setPhotoUrl(rs.getString("PhotoUrl"));
-	            result.setDatetime(rs.getString("Datetime"));
-	            return result;
-	        }, id);
-		}
-		catch (Exception e) 
-		{
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			logger.info("Error retrieving StatusID " + id + " from database.");
-		}
-		
-		logger.info("Exiting MainController:GetStatusById method");
-		
-		return statusItem;
-	}
-	
-	
+		return "post.html";
+	}	
 	
 	/**
 	 * Post a Status to database.
@@ -343,90 +158,53 @@ public class MainController
 	@PostMapping("/post")
 	public String SubmitStatus(@ModelAttribute Status status, Model model)
 	{		
-		logger.info("Entering MainController:SubmitStatus method.");
-		
-    	LocalDateTime timestamp = LocalDateTime.now();   
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a, M-dd-yyyy");
+		logger.info("Entering MainController:SubmitStatus() with Status: " + status.ToString());
         
-        
+    	LocalDateTime timestamp = LocalDateTime.now();  
         status.setDatetime(timestamp.format(formatter));
-
-		try {
-			Integer count = database.queryForObject("SELECT COUNT(*) FROM statuses", Integer.class);
-	    	if (count >= 0) 
-	    	{
-	    		logger.info("Database table 'statuses' exists, processing new status save to DB now...");
-	    	}				
-		}
-		catch (Exception e)
-		{
-			logger.error(e.getMessage());
-			
-			String createTableSql = "CREATE TABLE statuses (" +  
-					"Id INT PRIMARY KEY AUTO_INCREMENT, " +
-					"Author VARCHAR(255) NOT NULL, " + 
-					"Message VARCHAR(1000) NOT NULL, " +
-					"PhotoUrl VARCHAR(1000) NULL, " + 
-					"Datetime VARCHAR(100) NOT NULL" +
-				");";
-			
-			database.execute(createTableSql); 			
-			
-			logger.info("Sql table statuses did not exist so application created one.");
-		}
 		
-		if (DoesStatusExist(status.getId()))
-		{			
-			if (!GetStatusById(status.getId()).ToString().contains(status.ToString()))
-			{
-				UpdateStatusById(status.getId(), status);
-			}
-		}
-		else 
-		{
-			AddNewStatus(status);	
-		}	
+        // for existing status updates 
+		if (dbService.DoesStatusIdExistInDB(status.getId()) 
+				&& !dbService.GetStatusByIdFromDB(status.getId()).ToString().contains(status.ToString()))
+		{	
+			dbService.UpdateStatusInDB(status.getId(), status);
+		}        
+        // for new status updates 
+		else if (!dbService.DuplicateStatusCheck(status.getAuthor(), status.getMessage(), status.getPhotoUrl()))
+	    {
+	    	dbService.InsertStatusIntoDB(status);
+	    }	
 		
-		List<Status> statuses = GetAllStatuses();
+		List<Status> statuses = dbService.GetAllStatusDescendingByIdFromDB();
 
 		model.addAttribute("statuses", statuses);
 		model.addAttribute("status", new Status()); 
 		
-		logger.info("Exiting MainController:SubmitStatus method.");
+		logger.info("Exiting MainController:SubmitStatus() with '" + statuses.size() + "' Statuses and new Status: " + status.ToString());
 		 
 		return "home.html";
 	}
-	
-	
-	
-	/**
-	 * Update Status record by its ID in database.
-	 * @param id
-	 * @param status
-	 */
-	public void UpdateStatusById(int id, Status status)
-	{
-		logger.info("Entering MainController:UpdateStatusById method.");
-		
-		try {
-			String sql = "UPDATE statuses SET Author = ?, Message = ?, PhotoUrl = ?, Datetime = ? WHERE Id = ?";
-	        database.update(sql, 
-	        				status.getAuthor(), 
-	        				status.getMessage(), 
-	        				status.getPhotoUrl(), 
-	        				status.getDatetime(), 
-	        				id);
-		}
-		catch (Exception e) 
-		{
-			logger.error(e.getMessage());
-			e.printStackTrace();
-			logger.info("Error updating StatusID " + id + " in database.");
-		}
-		
-		logger.info("Exiting MainController:UpdateStatusById method");
-	}
-	
-	
-	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
