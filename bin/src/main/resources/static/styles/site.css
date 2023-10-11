@@ -25,12 +25,17 @@ label {
 }
 
 .PhotoPreview {
-	width:300px;
-	max-width:100%;
-	height:auto;
 	display:block;
+	height:auto;
 	margin:1% 0%;
+	max-width:100%;
+	transition: all 0.4s;
+	width:300px;
 }
+	.PhotoPreview:hover {
+		cursor:pointer;
+		width:600px;
+	}
 
 #StatusMessageInput {
 	width:100%;

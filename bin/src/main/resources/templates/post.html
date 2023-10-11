@@ -24,7 +24,10 @@
 	-->
 	
 	<form action="#" th:action="@{/post}" th:object="${status}" method="post">
-		<!--<input type="text" th:field="*{Id}" placeholder="Type id here" required style="max-width:30px;" />-->	
+
+		<div style="display:none;">
+			<label>ID</label><input id="StatusIdInput" type="number" th:field="*{Id}" placeholder="" /><br/>
+		</div>
 		
 		<label>Author</label><br/><input id="StatusAuthorInput" type="text" th:field="*{Author}" placeholder="Type name here" required /><br/>
 			
@@ -32,7 +35,11 @@
 				
 		<label>Photo URL</label> <input id="StatusPhotoUrlInput" type="text" th:field="*{PhotoUrl}" placeholder="Type a photo url here"/><br/>
 		
-		<img class="PhotoPreview" style="display:none;" id="PhotoPreview" src="#"/>
+		<div style="display:none;">
+			<label>Datetime</label> <input id="StatusDatetimeInput" type="text" th:field="*{Datetime}" placeholder="" /><br/>
+		</div>
+		
+		<img class="PhotoPreview" style="display:block" id="PhotoPreview" th:src="${status.getPhotoUrl()}"/>
 		
 		<button id="SubmitStatusBtn" alt="Photo Preview" type="submit">Submit</button>
 	</form>	

@@ -28,8 +28,12 @@
 	
 	<p th:if="${statuses == null || statuses.size() == 0}">Try adding a new status from posts page.</p>
 	<div th:if="${statuses != null}">
-		<div class="StatusBox" th:each="e : ${statuses}">			
+		<div class="StatusBox" th:each="e : ${statuses}">	
+				
 			<label>#</label><span th:text="${e.getId()}"></span><br/>
+			<a th:href="@{'/delete/' + ${e.getId()}}">delete</a><br/>
+			<a th:href="@{'/post/' + ${e.getId()}}">edit</a><br/>
+			
 			<label>Author</label> <span th:text="${e.getAuthor()}"></span><br/>
 			<label>Message</label> <span th:text="${e.getMessage()}"></span><br/>
 			<div th:if='${e.getPhotoUrl() != ""}'>

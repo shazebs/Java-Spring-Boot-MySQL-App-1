@@ -165,6 +165,8 @@ public class DatabaseService
 	 */
 	public boolean DuplicateStatusCheck(String author, String message, String photoUrl)
 	{
+		logger.info("Entering DabaseService:DuplicateStatus Check() with author: " + author + ", message: " + message + ", and photoUrl: " + photoUrl);
+		
 		try {
 			String sql = "SELECT COUNT(*) FROM statuses WHERE Author = ? AND Message = ? AND PhotoUrl = ?;";
 			int result = database.queryForObject(sql, Integer.class, author, message, photoUrl);
