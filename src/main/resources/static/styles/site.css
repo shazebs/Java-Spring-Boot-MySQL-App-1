@@ -1,6 +1,9 @@
+#BloggingSiteIframe {
+	height:750px;
+}
+
 body {
-	padding:5%;
-	padding-top:1%;
+	padding:1% 5%;
 }
 
 label {
@@ -29,7 +32,8 @@ label {
 	height:auto;
 	margin:1% 0%;
 	transition: all 0.50s;
-	width:300px;
+	/*width:300px;*/
+	width:25%;
 }
 	.PhotoPreview:hover {
 		cursor:pointer;
@@ -48,8 +52,11 @@ label {
 }
 
 @media (max-width:600px) {
+	#BloggingSiteIframe {
+		height:600px;
+	}
 	.PhotoPreview {
-		width:50%;
+		width:35%;
 	}
 	.PhotoPreview:hover {
 		transform:translateX(0%);
