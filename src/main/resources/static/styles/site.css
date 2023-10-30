@@ -28,13 +28,13 @@ label {
 	display:block;
 	height:auto;
 	margin:1% 0%;
-	max-width:100%;
-	transition: all 0.4s;
+	transition: all 0.50s;
 	width:300px;
 }
 	.PhotoPreview:hover {
 		cursor:pointer;
-		width:600px;
+		transform:translateX(15%);
+		width:75%;
 	}
 
 #StatusMessageInput {
@@ -45,4 +45,14 @@ label {
 
 #SubmitStatusBtn {
 	margin-top:1%;
+}
+
+@media (max-width:600px) {
+	.PhotoPreview {
+		width:50%;
+	}
+	.PhotoPreview:hover {
+		transform:translateX(0%);
+		width:100%;
+	}
 }
