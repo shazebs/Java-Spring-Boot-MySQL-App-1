@@ -74,7 +74,7 @@ public class DatabaseService
 		try {	    	
 			String createTableSql = 
 					"CREATE TABLE statuses (" 
-						+ "Id INT PRIMARY KEY AUTO_INCREMENT, "
+						+ "Id INT IDENTITY(1,1) PRIMARY KEY,"
 						+ "Author VARCHAR(255) NOT NULL, "
 						+ "Message VARCHAR(1000) NOT NULL, "
 						+ "PhotoUrl VARCHAR(1000) NULL, "
@@ -276,9 +276,8 @@ public class DatabaseService
 		
 		int queryResult = -1;		
 		try {
-			String sql = "INSERT INTO statuses (Id, Author, Message, PhotoUrl, Datetime) VALUES (?, ?, ?, ?, ?)";
+			String sql = "INSERT INTO statuses (Author, Message, PhotoUrl, Datetime) VALUES (?, ?, ?, ?)";
 			queryResult = database.update(sql, 
-										 status.getId(), 
 										 status.getAuthor(),	
 										 status.getMessage(), 
 										 status.getPhotoUrl(), 
