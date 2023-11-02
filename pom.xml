@@ -15,21 +15,21 @@
 	<description>Demo project for Spring Boot</description>
 	<packaging>jar</packaging>
 	<properties>
-		<java.version>11</java.version>
-		<!--<java.version>1.8</java.version>-->
+		<!--<java.version>11</java.version>-->
+		<java.version>1.8</java.version>
 	</properties>
 	
 	<dependencies>
-		<!-- for Azure SQL Server -->
+		<!-- for Azure SQL Server 
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-		<!--<dependency>
+		</dependency>-->
+		<!----><dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-		</dependency>-->
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jdbc</artifactId>
