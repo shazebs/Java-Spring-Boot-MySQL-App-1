@@ -1,5 +1,5 @@
 #BloggingSiteIframe {
-	height:750px;
+	height:700px;
 }
 
 body {
@@ -53,7 +53,7 @@ label {
 
 @media (max-width:600px) {
 	#BloggingSiteIframe {
-		height:600px;
+		height:550px;
 	}
 	.PhotoPreview {
 		width:35%;
