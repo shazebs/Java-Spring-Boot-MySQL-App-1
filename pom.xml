@@ -5,8 +5,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<!--<version>2.7.4</version>-->
-		<version>3.0.6</version>
+		<version>2.7.4</version>
+		<!--<version>3.0.6</version>-->
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.gcu</groupId>
@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.33</version>
+			<!--<version>8.0.33</version>-->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
