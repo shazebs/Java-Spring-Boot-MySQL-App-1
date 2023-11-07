@@ -15,17 +15,6 @@
 	
 	<h1>Home Page.</h1>
 	
-	<!-- display latest status  
-	<div class="StatusBox" th:if="${status} != null">
-		<label>Author</label> <span th:text="${status.getAuthor()}"></span><br/>
-		<label>Message</label> <span th:text="${status.getMessage()}"></span><br/>
-		<section th:if='${status.getPhotoUrl() != ""}'>
-			<label>Photo</label> <span id="PhotoUrlSpan" th:text="${status.getPhotoUrl()}"><span><br/>
-		</section>
-		<label>Datetime</label> <span th:text="${status.getDatetime()}"></span><br/>
-	</div>
-	-->
-	
 	<p th:if="${statuses == null || statuses.size() == 0}">Try adding a new status from posts page.</p>
 	<div th:if="${statuses != null}">
 		<div class="StatusBox" th:each="e : ${statuses}">	
