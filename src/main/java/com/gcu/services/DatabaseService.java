@@ -74,7 +74,8 @@ public class DatabaseService
 		try {	    	
 			String createTableSql = 
 					"CREATE TABLE statuses (" 
-						+ "Id INT IDENTITY(1,1) PRIMARY KEY,"
+						+ "Id INT AUTO_INCREMENT PRIMARY KEY," 		// uncomment for MySQL
+						// + "Id INT IDENTITY(1,1) PRIMARY KEY," 	// uncomment for MS SQL Server
 						+ "Author VARCHAR(255) NOT NULL, "
 						+ "Message VARCHAR(1000) NOT NULL, "
 						+ "PhotoUrl VARCHAR(1000) NULL, "
