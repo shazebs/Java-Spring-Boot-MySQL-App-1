@@ -20,7 +20,7 @@
 		<div class="StatusBox" th:each="e : ${statuses}">	
 				
 			<label>#</label><span th:text="${e.getId()}"></span><br/>
-			<a th:href="@{'/delete/' + ${e.getId()}}">delete</a><br/>
+			<!-- <a th:href="@{'/delete/' + ${e.getId()}}">delete</a><br/> -->
 			<a th:href="@{'/post/' + ${e.getId()}}">edit</a><br/>
 			
 			<label>Author</label> <span th:text="${e.getAuthor()}"></span><br/>
